@@ -28,11 +28,25 @@ async function run() {
       .db("dentist_appointment")
       .collection("bookings");
 
+    const userCollection = client.db("dentist_appointment").collection("users");
+
     app.get("/service", async (req, res) => {
       const query = {};
       const cursor = serviceCollection.find(query);
       const services = await cursor.toArray();
       res.send(services);
+    });
+
+    app.put("/user/:email", async (req, res) => {
+      const email = req.params.email;
+      const user = req.body;
+      const filter = { email: email };
+      const options = { upsert: true };
+      const updateDoc = {
+        $set: user,
+      };
+      const result = await userCollection.updateOne(filter, updateDoc, options);
+      res.send(result);
     });
 
     // Warning: This is not the proper way to query multiple collection.
