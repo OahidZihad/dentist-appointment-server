@@ -54,7 +54,9 @@ async function run() {
     });
 
     app.get("/user", verifyJWT, async (req, res) => {
-      const users = await userCollection.find().toArray();
+      const q = req.query.q;
+      const filter = q ? { email: new RegExp(q, "i") } : {};
+      const users = await userCollection.find(filter).toArray();
       res.send(users);
     });
 
