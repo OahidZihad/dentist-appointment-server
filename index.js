@@ -54,8 +54,12 @@ async function run() {
     });
 
     app.get("/user", verifyJWT, async (req, res) => {
-      const users = await userCollection.find().toArray();
-      res.send(users);
+      const page = parseInt(req.query.page) || 1;
+      const limit = parseInt(req.query.limit) || 10;
+      const skip = (page - 1) * limit;
+      const total = await userCollection.countDocuments();
+      const users = await userCollection.find().skip(skip).limit(limit).toArray();
+      res.send({ users, total });
     });
 
     app.put("/user/admin/:email", verifyJWT, async (req, res) => {
